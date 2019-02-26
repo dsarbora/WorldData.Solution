@@ -1,48 +1,61 @@
+using System.Collections.Generic;
 using System;
 using MySql.Data.MySqlClient;
-using WorldData;
 
-namespace WorldDate.Models
+namespace WorldData.Models
 {
     public class City
     {
-        private int ID;
-        private string Name;
-        private string CountryCode;
-        private string District;
-        private int Population;
+        private string _name;
+        private int _population;
+        private string _countryCode;
 
-        public City(int cityId, string cityName, string countryCode, string district, int population)
+        public City(string name, int population, string countryCode)
         {
-            ID = cityId;
-            Name = cityName;
-            CountryCode = countryCode;
-            District = district;
-            Population = population;
+            _name = name;
+            _population = population;
+            _countryCode = countryCode;
         }
-        public static List<City> GetAll()
+
+        public string GetName()
         {
-            List<City> allCities = new List<City>{};
-            MySqlConntection conn = DB.Connection();
+            return _name;
+        }
+        public int GetPopulation()
+        {
+            return _population;
+        }
+        public string GetCountryCode()
+        {
+            return _countryCode;
+        }
+
+        public static List<City> GetAllCities()
+        {
+            List<City> allCities = new List<City> {};
+            MySqlConnection conn = DB.Connection();
             conn.Open();
             MySqlCommand cmd = conn.CreateCommand() as MySqlCommand;
             cmd.CommandText = @"SELECT * FROM city;";
             MySqlDataReader rdr = cmd.ExecuteReader() as MySqlDataReader;
-            while(rdr.Read())
+
+            while (rdr.Read())
             {
-                int cityId = rdr.GetInt32(0);
-                string cityName = rdr.GetString(1);
-                string countryCode = rdr.GetString(2);
-                string district = rdr.GetString(3);
+                string name = rdr.GetString(1);
                 int population = rdr.GetInt32(4);
-                City newCity = new City(cityId, cityName, countryCode, district, population);
+                string countryCode = rdr.GetString(2);
+                City newCity = new City(name, population, countryCode);
                 allCities.Add(newCity);
             }
+
             conn.Close();
-            if(conn!=null)
+
+            if (conn != null)
             {
                 conn.Dispose();
             }
+
             return allCities;
+        }
     }
 }
